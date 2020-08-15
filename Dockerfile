@@ -1,90 +1,40 @@
-FROM php:7.4-fpm
-
+FROM php:7.4.9-fpm-alpine
 
 MAINTAINER Hampster <phper.blue@gmail.com>
 
-# Install general packages
-RUN sed -i 's/deb.debian.org/mirrors.tuna.tsinghua.edu.cn/' /etc/apt/sources.list && \
-    sed -i 's/security.debian.org/mirrors.tuna.tsinghua.edu.cn/' /etc/apt/sources.list && \
-    sed -i 's/security-cdn.debian.org/mirrors.tuna.tsinghua.edu.cn/' /etc/apt/sources.list && \
-    apt-get update && apt-get install -y \
-    libfreetype6-dev \
-    libjpeg62-turbo-dev \
-    libpng-dev \
-    libxpm-dev \
-    libvpx-dev \
-	libfreetype6-dev \
-	libjpeg62-turbo-dev \
-	libmcrypt-dev \
-	libcurl4-gnutls-dev \
-	pkg-config \
-	gcc \
-	make \
-	autoconf \
-	libc-dev \
-    libxml2-dev \
-    librabbitmq-dev \
-    libssh-dev \
-    unzip \
-    default-mysql-client \
-    zlib1g-dev \
-    libicu-dev \
-    g++ \
-    wget \
-    gnupg \
-    software-properties-common \
-    openssh-client \
-    git-core \
-    libzip-dev \
-    libonig-dev \
-    && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
-    && docker-php-ext-install gd \
-    && :\
-    && apt-get install -y libicu-dev \
-    && docker-php-ext-install intl \
-    && :\
-    && apt-get install -y libxml2-dev \
-    && apt-get install -y libxslt-dev \
-    && docker-php-ext-install soap \
-    && docker-php-ext-install xsl \
-    && docker-php-ext-install xmlrpc \
-    && :\
-    && apt-get install -y libbz2-dev \
-    && docker-php-ext-install bz2 \
-    && docker-php-ext-install zip \
-    && docker-php-ext-install pcntl \
-    && docker-php-ext-install pdo_mysql \
-    && docker-php-ext-install mysqli \
-    && docker-php-ext-install mbstring \
-    && docker-php-ext-install exif \
-    && docker-php-ext-install bcmath \
-    && docker-php-ext-install calendar \
-    && docker-php-ext-install sockets \
-    && docker-php-ext-install gettext \
-    && docker-php-ext-install shmop \
-    && docker-php-ext-install sysvmsg \
-    && docker-php-ext-install sysvsem \
-    && docker-php-ext-install sysvshm \
-    && docker-php-ext-install opcache
+# Change source
+RUN echo http://mirrors.aliyun.com/alpine/v3.12/main > /etc/apk/repositories \
+    && echo http://mirrors.aliyun.com/alpine/v3.12/community >> /etc/apk/repositories
+
+RUN apk add --no-cache autoconf \
+      gcc g++ make \
+      oniguruma-dev \
+      curl-dev \
+      libxml2-dev \
+      libzip-dev \
+      libpng-dev freetype \
+      libpng \
+      libjpeg-turbo \
+      freetype-dev \
+      libpng-dev \
+      jpeg-dev \
+      libjpeg \
+      libjpeg-turbo-dev
 
 # Install PHP redis
 RUN pecl install -o -f redis \
-&& rm -rf /tmp/pear \
-&&  echo "extension=redis.so" > /usr/local/etc/php/conf.d/redis.ini
+    &&  rm -rf /tmp/pear \
+    &&  echo "extension=redis.so" > /usr/local/etc/php/conf.d/redis.ini
 
+# Add gd library
+RUN docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/
 
-RUN apt-get install -y \
-        librabbitmq-dev \
-        libssh-dev \
-    && docker-php-ext-install \
-        bcmath \
-        sockets \
-    && pecl install amqp \
-    && docker-php-ext-enable amqp
+RUN docker-php-ext-install gd bcmath pdo_mysql mysqli opcache json mbstring
 
 # Install composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
-	&& composer config -g repo.packagist composer https://mirrors.aliyun.com/composer 
+RUN wget https://mirrors.aliyun.com/composer/composer.phar -O /usr/local/bin/composer \
+    && chmod a+x /usr/local/bin/composer \
+    && composer config -g repo.packagist composer https://mirrors.aliyun.com/composer
 
 # 创建慢查询目录
 RUN mkdir /usr/local/log/
@@ -95,7 +45,9 @@ COPY etc /usr/local/etc
 # Use the default production configuration
 COPY php.ini "$PHP_INI_DIR/php.ini"
 
-# Override with custom opcache settings
+# Override with custom settings
 COPY config/opcache.ini $PHP_INI_DIR/conf.d/
+COPY config/expose_php.ini $PHP_INI_DIR/conf.d/
+COPY config/upload.ini $PHP_INI_DIR/conf.d/
 
 CMD ["php-fpm", "-R"]
