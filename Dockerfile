@@ -1,4 +1,4 @@
-FROM php:7.4.9-fpm-alpine
+FROM php:7.4.11-fpm-alpine
 
 MAINTAINER Hampster <phper.blue@gmail.com>
 
@@ -43,7 +43,7 @@ RUN mkdir /usr/local/log/
 COPY etc /usr/local/etc
 
 # Use the default production configuration
-COPY php.ini "$PHP_INI_DIR/php.ini"
+COPY config/php.ini "$PHP_INI_DIR/php.ini"
 
 # Override with custom settings
 COPY config/opcache.ini $PHP_INI_DIR/conf.d/
