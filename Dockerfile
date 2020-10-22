@@ -29,7 +29,7 @@ RUN pecl install -o -f redis \
 # Add gd library
 RUN docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/
 
-RUN docker-php-ext-install gd bcmath pdo_mysql mysqli opcache
+RUN docker-php-ext-install gd bcmath pdo_mysql mysqli opcache pcntl
 
 # Install composer
 RUN wget https://mirrors.aliyun.com/composer/composer.phar -O /usr/local/bin/composer \
