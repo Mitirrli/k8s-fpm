@@ -1,7 +1,7 @@
-FROM php:7.4.12-fpm-alpine
+FROM php:8.0.0RC4-fpm-alpine
 
 LABEL NAME="PHP-FPM"
-LABEL Version="7.4.12"
+LABEL Version="8.0.0RC4"
 LABEL MAINTAINER="Hampster <phper.blue@gmail.com>"
 
 # Change source
@@ -54,4 +54,4 @@ COPY config/upload.ini $PHP_INI_DIR/conf.d/
 
 EXPOSE 9000
 
-CMD ["php-fpm", "-R"]
+CMD [ "php-fpm", "-R" ]
