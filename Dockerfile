@@ -1,7 +1,8 @@
-FROM php:8.0.0RC4-fpm-alpine
+ARG PHPVERSION=8.0.0RC4-fpm-alpine
+FROM php:${PHPVERSION}
 
 LABEL NAME="PHP-FPM"
-LABEL Version="8.0.0RC4"
+LABEL VERSION=${PHPVERSION}
 LABEL MAINTAINER="Hampster <phper.blue@gmail.com>"
 
 # Change source
@@ -23,12 +24,13 @@ RUN apk add --no-cache autoconf \
     libjpeg \
     libjpeg-turbo-dev
 
-# Install PHP redis
-RUN curl -L -o /tmp/redis.tar.gz https://github.com/phpredis/phpredis/archive/5.3.2.tar.gz \
+# Install redis
+ARG REDISVERSION=5.3.2
+RUN curl -L -o /tmp/redis.tar.gz https://github.com/phpredis/phpredis/archive/${REDISVERSION}.tar.gz \
     && tar xfz /tmp/redis.tar.gz \
     && rm -r /tmp/redis.tar.gz \
     && mkdir -p /usr/src/php/ext \
-    && mv phpredis-5.3.2 /usr/src/php/ext/phpredis
+    && mv phpredis-${REDISVERSION} /usr/src/php/ext/phpredis
 
 RUN docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
     && docker-php-ext-install gd bcmath pdo_mysql mysqli opcache phpredis
@@ -38,10 +40,10 @@ RUN wget https://mirrors.aliyun.com/composer/composer.phar -O /usr/local/bin/com
     && chmod a+x /usr/local/bin/composer \
     && composer config -g repo.packagist composer https://mirrors.aliyun.com/composer
 
-# 创建慢查询目录
+# Mkdir slow query directory
 RUN mkdir /usr/local/log/
 
-# 复制配置文件到 /usr/local
+# Copy configuration to /usr/local 
 COPY etc /usr/local/etc
 
 # Use the default production configuration
