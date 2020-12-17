@@ -35,11 +35,6 @@ RUN curl -L -o /tmp/redis.tar.gz https://github.com/phpredis/phpredis/archive/${
 RUN docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
     && docker-php-ext-install gd bcmath pdo_mysql mysqli opcache phpredis
 
-# Install composer
-RUN wget https://mirrors.aliyun.com/composer/composer.phar -O /usr/local/bin/composer \
-    && chmod a+x /usr/local/bin/composer \
-    && composer config -g repo.packagist composer https://mirrors.aliyun.com/composer
-
 # Mkdir slow query directory
 RUN mkdir /usr/local/log/
 
@@ -54,6 +49,4 @@ COPY config/opcache.ini $PHP_INI_DIR/conf.d/
 COPY config/expose_php.ini $PHP_INI_DIR/conf.d/
 COPY config/upload.ini $PHP_INI_DIR/conf.d/
 
-EXPOSE 9000
-
-CMD [ "php-fpm", "-R" ]
+CMD [ "php-fpm" , "-F"]
