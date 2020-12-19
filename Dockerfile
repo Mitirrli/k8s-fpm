@@ -35,11 +35,11 @@ RUN curl -L -o /tmp/redis.tar.gz https://github.com/phpredis/phpredis/archive/${
 RUN docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
     && docker-php-ext-install gd bcmath pdo_mysql mysqli opcache phpredis
 
-# Mkdir slow query directory
-RUN mkdir /usr/local/log/
-
-# Copy configuration to /usr/local 
+# Copy configuration to /usr/local
 COPY etc /usr/local/etc
+
+# 创建慢查询目录
+RUN mkdir /usr/local/log/
 
 # Use the default production configuration
 COPY config/php.ini "$PHP_INI_DIR/php.ini"
