@@ -1,4 +1,4 @@
-ARG PHPVERSION=8.0.0-fpm-alpine
+ARG PHPVERSION=8.0.3-fpm-alpine
 FROM php:${PHPVERSION}
 
 LABEL NAME="PHP-FPM"
@@ -25,7 +25,7 @@ RUN apk add --no-cache autoconf \
     libjpeg-turbo-dev
 
 # Install redis
-ARG REDISVERSION=5.3.2
+ARG REDISVERSION=5.3.4
 RUN curl -L -o /tmp/redis.tar.gz https://github.com/phpredis/phpredis/archive/${REDISVERSION}.tar.gz \
     && tar xfz /tmp/redis.tar.gz \
     && rm -r /tmp/redis.tar.gz \
