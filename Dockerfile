@@ -1,4 +1,4 @@
-ARG PHPVERSION=8.0.3-fpm-alpine
+ARG PHPVERSION=8.0.7-fpm-alpine
 FROM php:${PHPVERSION}
 
 LABEL NAME="PHP-FPM"
@@ -48,5 +48,6 @@ COPY config/php.ini "$PHP_INI_DIR/php.ini"
 COPY config/opcache.ini $PHP_INI_DIR/conf.d/
 COPY config/expose_php.ini $PHP_INI_DIR/conf.d/
 COPY config/upload.ini $PHP_INI_DIR/conf.d/
+COPY config/session.ini $PHP_INI_DIR/conf.d/
 
 CMD [ "php-fpm" , "-F"]
